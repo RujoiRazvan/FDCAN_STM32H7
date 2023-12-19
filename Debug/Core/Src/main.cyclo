@@ -1,0 +1,9 @@
+../Core/Src/main.c:76:6:FDCAN2_SendMessage	2
+../Core/Src/main.c:92:6:FDCAN1_SendMessage	2
+../Core/Src/main.c:113:5:main	1
+../Core/Src/main.c:168:6:SystemClock_Config	4
+../Core/Src/main.c:227:13:MX_FDCAN1_Init	2
+../Core/Src/main.c:280:13:MX_FDCAN2_Init	2
+../Core/Src/main.c:333:13:MX_USART3_UART_Init	5
+../Core/Src/main.c:381:13:MX_GPIO_Init	1
+../Core/Src/main.c:425:6:Error_Handler	1
