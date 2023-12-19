@@ -1,0 +1,1 @@
+Codul functioneaza. Trebuie conectat Lawicelul si activata comunicatia (V -> S6 -> O). Daca e conectat Lawicelul, functioneaza si delayul din while.

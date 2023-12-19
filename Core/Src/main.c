@@ -41,7 +41,6 @@
 
 /* Private variables ---------------------------------------------------------*/
 
-FDCAN_HandleTypeDef hfdcan1;
 FDCAN_HandleTypeDef hfdcan2;
 
 UART_HandleTypeDef huart3;
@@ -55,7 +54,6 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_FDCAN2_Init(void);
 static void MX_USART3_UART_Init(void);
-static void MX_FDCAN1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -63,8 +61,6 @@ static void MX_FDCAN1_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 FDCAN_TxHeaderTypeDef TxHeader;
-FDCAN_TxHeaderTypeDef TxHeader2;
-#define DATA_LEN 12
 
 uint8_t TxData[8] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
 uint8_t TxData1[8] = {0x08, 0x09, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15};
@@ -82,28 +78,9 @@ void FDCAN2_SendMessage(uint32_t identifier, uint8_t *data, uint8_t dataLength) 
   TxHeader.DataLength = FDCAN_DLC_BYTES_8;
 
 
-  if (HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan2, &TxHeader, data) != HAL_OK)
-  {
-    Error_Handler();
-
-  }
+  HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan2, &TxHeader, data);
 }
 
-void FDCAN1_SendMessage(uint32_t identifier, uint8_t *data, uint8_t dataLength) {
-  uint32_t TxMailbox;
-
-  TxHeader2.Identifier = 0x55;
-  TxHeader2.IdType = FDCAN_STANDARD_ID;
-  TxHeader2.TxFrameType = FDCAN_DATA_FRAME;
-  TxHeader2.DataLength = FDCAN_DLC_BYTES_8;
-
-
-  if (HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1, &TxHeader2, data) != HAL_OK)
-  {
-    Error_Handler();
-
-  }
-}
 /* USER CODE END 0 */
 
 /**
@@ -136,10 +113,8 @@ int main(void)
   MX_GPIO_Init();
   MX_FDCAN2_Init();
   MX_USART3_UART_Init();
-  MX_FDCAN1_Init();
   /* USER CODE BEGIN 2 */
   HAL_FDCAN_Start(&hfdcan2);
-  HAL_FDCAN_Start(&hfdcan1);
 
   FDCAN2_SendMessage(messageID, TxData1, sizeof(TxData));
   FDCAN2_SendMessage(messageID, TxData3, sizeof(TxData));
@@ -150,7 +125,7 @@ int main(void)
   while (1)
   {
 	  FDCAN2_SendMessage(messageID, TxData3, sizeof(TxData3));
-	  HAL_Delay(1000);
+	  HAL_Delay(100);
 
 	  //HAL_Delay(10000);
 
@@ -220,59 +195,6 @@ void SystemClock_Config(void)
 }
 
 /**
-  * @brief FDCAN1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_FDCAN1_Init(void)
-{
-
-  /* USER CODE BEGIN FDCAN1_Init 0 */
-
-  /* USER CODE END FDCAN1_Init 0 */
-
-  /* USER CODE BEGIN FDCAN1_Init 1 */
-
-  /* USER CODE END FDCAN1_Init 1 */
-  hfdcan1.Instance = FDCAN1;
-  hfdcan1.Init.FrameFormat = FDCAN_FRAME_CLASSIC;
-  hfdcan1.Init.Mode = FDCAN_MODE_NORMAL;
-  hfdcan1.Init.AutoRetransmission = DISABLE;
-  hfdcan1.Init.TransmitPause = DISABLE;
-  hfdcan1.Init.ProtocolException = DISABLE;
-  hfdcan1.Init.NominalPrescaler = 16;
-  hfdcan1.Init.NominalSyncJumpWidth = 1;
-  hfdcan1.Init.NominalTimeSeg1 = 2;
-  hfdcan1.Init.NominalTimeSeg2 = 2;
-  hfdcan1.Init.DataPrescaler = 1;
-  hfdcan1.Init.DataSyncJumpWidth = 1;
-  hfdcan1.Init.DataTimeSeg1 = 1;
-  hfdcan1.Init.DataTimeSeg2 = 1;
-  hfdcan1.Init.MessageRAMOffset = 0;
-  hfdcan1.Init.StdFiltersNbr = 0;
-  hfdcan1.Init.ExtFiltersNbr = 0;
-  hfdcan1.Init.RxFifo0ElmtsNbr = 0;
-  hfdcan1.Init.RxFifo0ElmtSize = FDCAN_DATA_BYTES_8;
-  hfdcan1.Init.RxFifo1ElmtsNbr = 0;
-  hfdcan1.Init.RxFifo1ElmtSize = FDCAN_DATA_BYTES_8;
-  hfdcan1.Init.RxBuffersNbr = 0;
-  hfdcan1.Init.RxBufferSize = FDCAN_DATA_BYTES_8;
-  hfdcan1.Init.TxEventsNbr = 0;
-  hfdcan1.Init.TxBuffersNbr = 0;
-  hfdcan1.Init.TxFifoQueueElmtsNbr = 1;
-  hfdcan1.Init.TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
-  hfdcan1.Init.TxElmtSize = FDCAN_DATA_BYTES_8;
-  if (HAL_FDCAN_Init(&hfdcan1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN FDCAN1_Init 2 */
-
-  /* USER CODE END FDCAN1_Init 2 */
-
-}
-
-/**
   * @brief FDCAN2 Initialization Function
   * @param None
   * @retval None
@@ -294,12 +216,12 @@ static void MX_FDCAN2_Init(void)
   hfdcan2.Init.TransmitPause = DISABLE;
   hfdcan2.Init.ProtocolException = DISABLE;
   hfdcan2.Init.NominalPrescaler = 1;
-  hfdcan2.Init.NominalSyncJumpWidth = 13;
-  hfdcan2.Init.NominalTimeSeg1 = 86;
-  hfdcan2.Init.NominalTimeSeg2 = 13;
-  hfdcan2.Init.DataPrescaler = 25;
-  hfdcan2.Init.DataSyncJumpWidth = 7;
-  hfdcan2.Init.DataTimeSeg1 = 2;
+  hfdcan2.Init.NominalSyncJumpWidth = 1;
+  hfdcan2.Init.NominalTimeSeg1 = 4;
+  hfdcan2.Init.NominalTimeSeg2 = 3;
+  hfdcan2.Init.DataPrescaler = 1;
+  hfdcan2.Init.DataSyncJumpWidth = 1;
+  hfdcan2.Init.DataTimeSeg1 = 1;
   hfdcan2.Init.DataTimeSeg2 = 1;
   hfdcan2.Init.MessageRAMOffset = 0;
   hfdcan2.Init.StdFiltersNbr = 0;
@@ -388,7 +310,6 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, L1_Pin|L2_Pin, GPIO_PIN_RESET);
