@@ -70,9 +70,8 @@ uint32_t messageID = 0x123; // ID-ul mesajului
 uint32_t TxMailbox;
 
 void FDCAN2_SendMessage(uint32_t identifier, uint8_t *data, uint8_t dataLength) {
-  uint32_t TxMailbox;
 
-  TxHeader.Identifier = 0x321;
+  TxHeader.Identifier = identifier;
   TxHeader.IdType = FDCAN_STANDARD_ID;
   TxHeader.TxFrameType = FDCAN_DATA_FRAME;
   TxHeader.DataLength = FDCAN_DLC_BYTES_8;
@@ -126,8 +125,6 @@ int main(void)
   {
 	  FDCAN2_SendMessage(messageID, TxData3, sizeof(TxData3));
 	  HAL_Delay(100);
-
-	  //HAL_Delay(10000);
 
     /* USER CODE END WHILE */
 
